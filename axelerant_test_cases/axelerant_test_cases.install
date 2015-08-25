@@ -1,0 +1,23 @@
+<?php
+/**
+ * @file
+ * install file for axelerant test Cases module
+ */
+
+/**
+ * Implements hook_update_N().
+ *
+ * Grant the permission to authenticated role user.
+ */
+function axelerant_test_cases_update_7001() {
+  // Role to grant the permissions to
+  $authenticated_role = user_role_load_by_name('authenticated user');
+  $authenticated_rid = $authenticated_role->rid;
+  // Define our 'editor' role permissions
+  $authenticated_permissions = array(
+    'axelerant test cases block' => TRUE,
+    'axelerant test cases admin' => TRUE,
+  );
+  // Grant permissions to our 'authenticated' role
+  user_role_change_permissions($authenticated_rid, $authenticated_permissions);
+}

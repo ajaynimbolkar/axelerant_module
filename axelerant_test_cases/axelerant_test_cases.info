@@ -1,0 +1,9 @@
+name = Axelerant Test Cases
+description = Defines a different kind of test cases used in drupal.
+core = 7.x
+package = Test Cases
+
+version = "7.x-1.0 beta1"
+core = "7.x"
+project = "test_cases"
+dependencies[] = ctools

@@ -1,0 +1,107 @@
+<?php
+
+/**
+ * @file
+ * This file defines all the necessary hooks and functions to create
+ * a test cases.
+ */
+
+/**
+ * Implements hook_permission().
+ * Set permission so that block visible to authenticate user.
+ */
+function axelerant_test_cases_permission() {
+  return array(
+    'axelerant test cases block' => array(
+      'title' => t('Axelerant test cases block'),
+      'description' => t('Perform administration task for block visibility.'),
+    ),
+    'axelerant test cases admin' => array(
+      'title' => t('Axelerant test cases admin'),
+      'description' => t('Perform administration task for admin form visibility.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function axelerant_test_cases_menu() {
+  $items = array();
+
+  $items['admin/config/axelerant/cases'] = array(
+    'title' => 'Axelerant Block Settings',
+    'description' => 'Configuration for Axelerant Test Cases Block Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('axelerant_test_cases_settings_form'),
+    'access arguments' => array('axelerant test cases admin'),
+    'file' => 'axelerant_test_cases.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+
+/**
+ * Implements hook_block_info().
+ * Define block for showing user last login time.
+ */
+function axelerant_test_cases_block_info() {
+  $blocks = array();
+
+  $blocks['last_login_time'] = array(
+    'info' => t('Last Login Time'),
+    'status' => TRUE,
+    'region' => 'sidebar_first',
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ * Created block for showing user last login time.
+ */
+function axelerant_test_cases_block_view($delta = '') {
+  $block = array();
+  switch($delta) {
+    case 'last_login_time':
+      if (user_access('axelerant test cases block')) {
+        $block['subject'] = t('You last logged in at');
+        $block['content'] = array(
+          '#markup' => _axelerant_test_cases_content(),
+          '#attached' => array(
+            'js' => array(
+              drupal_get_path('module', 'axelerant_test_cases') . '/js/axelerant_test_cases.js',
+            ),
+          ),
+          '#attributes' => array('class' => array('collapsible')),
+        );
+      }
+    breaK;
+  }
+
+  return $block;
+}
+
+/**
+ * Callback function for showing content in a block..
+ */
+function _axelerant_test_cases_content() {
+  // Show user last login time based on there timezone.
+  global $user;
+  $content = "";
+  $content .= variable_get('axelerant_test_cases_message') ? t("@std_block_message", array('@std_block_message' => variable_get('axelerant_test_cases_message'))) . '<br/>' : '';
+  $content .= format_date($user->access, $type = 'short', $format = '', $timezone = $user->timezone, $langcode = NULL);
+  return $content;
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function axelerant_test_cases_ctools_plugin_directory($module, $plugin_type) {
+  if ($module == 'ctools' && $plugin_type == 'content_types') {
+    return 'plugins/' . $plugin_type;
+  }
+}
